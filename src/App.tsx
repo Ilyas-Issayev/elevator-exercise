@@ -55,6 +55,8 @@ const App: React.FC = () => {
     setValue("floors", Number(data.floors) || 8);
     const currentFloors = Array.from({ length: data.lifts || 1 }, () => 0);
     setValue("currentFloors", currentFloors);
+    const busyElevators = Array.from({ length: data.lifts }, () => false);
+    setValue("busyElevators", busyElevators);
   };
 
   return (
@@ -70,6 +72,7 @@ const App: React.FC = () => {
         elevators={Number(getValues("lifts")) || 1}
         currentFloors={getValues("currentFloors") || []}
         currentFloor={currentFloor}
+        busyElevators={getValues("busyElevators") || []}
       />
     </Layout>
   );
