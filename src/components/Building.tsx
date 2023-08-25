@@ -41,7 +41,7 @@ const Building = ({ currentFloors, currentFloor, floors, elevators, busy }: IBui
         const index = findNearestFloorIndex(currentFloor, currentFloors, busy)
         busy[index] = true;
         return index;
-    }, [currentFloor, currentFloors, busies]);
+    }, [currentFloor, currentFloors, busy]);
     setTimeout(() => busy[nearestFloorIndex] = false, 1000);
     currentFloors[nearestFloorIndex] = currentFloor;
 
