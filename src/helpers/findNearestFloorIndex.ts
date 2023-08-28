@@ -3,9 +3,9 @@ const findNearestFloorIndex = (
   array: number[],
   busyElevators: boolean[]
 ) => {
-  let nearestIndex = -1;
+  let nearestIndex = 0;
   let nearestDifference = Infinity;
-
+  console.log(value)
   for (let i = 0; i < array.length; i++) {
     if (array[i] === value) return i;
   }
@@ -21,7 +21,6 @@ const findNearestFloorIndex = (
     }
   }
 
-  console.log(nearestIndex);
   return nearestIndex;
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, SubmitHandler, UseFormReturn } from "react-hook-form";
+import { useForm, UseFormReturn, FieldValues } from "react-hook-form";
 import styled from "styled-components";
 
 interface FormData {
@@ -8,8 +8,8 @@ interface FormData {
 }
 
 interface InputFormProps {
-  onSubmit: SubmitHandler<FormData>;
-  register: UseFormReturn<FormData>["register"];
+  onSubmit: any;
+  register: UseFormReturn<FieldValues>["register"];
 }
 
 const StyledInputForm = styled.div`

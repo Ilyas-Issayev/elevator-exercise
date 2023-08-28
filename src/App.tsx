@@ -2,16 +2,17 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import ElevatorButtons from "./components/Buttons";
 import Building from "./components/Building";
 import { Layout } from "./modules/Layout";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import InputForm from "./components/InputForm";
 
 const App: React.FC = () => {
+  const intervalRef = useRef<NodeJS.Timeout | undefined>();
   const {
     register,
     handleSubmit,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { },
   } = useForm();
 
   const [currentFloor, setCurrentFloor] = useState<number>(0);
@@ -31,6 +32,7 @@ const App: React.FC = () => {
 
   const moveToFloor = useCallback(
     (floor: number) => {
+      console.log(elevatorRequests)
       setCurrentFloor(floor);
       const newRequests = [...elevatorRequests];
       newRequests[floor] = false;
@@ -38,19 +40,20 @@ const App: React.FC = () => {
     },
     [elevatorRequests]
   );
-
   useEffect(() => {
     clearTimeout(interval.current);
-    interval.current = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       elevatorRequests.map((request, index) => {
         if (request == true) {
           moveToFloor(index);
         }
       })
-    }, 500);
+    }, 1000);
   }, [currentFloor, elevatorRequests, moveToFloor, getValues]);
 
-  const handleFormSubmit = (data: { lifts: number, floors: number }) => {
+  type MySubmitHandler = SubmitHandler<FieldValues>;
+
+  const handleFormSubmit: MySubmitHandler = (data) => {
     setValue("lifts", data.lifts || 1);
     setValue("floors", Number(data.floors) || 8);
     const currentFloors = Array.from({ length: data.lifts || 1 }, () => 0);

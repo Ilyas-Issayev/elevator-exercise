@@ -31,7 +31,6 @@ const StyledBuilding = styled.div<IStyledBuild>`
 
 
 const Building = memo(({ currentFloors, currentFloor, floors, elevators, busyElevators }: IBuilding) => {
-    console.log(currentFloor, currentFloors, busyElevators)
     const nearestFloorIndex = useMemo(() => {
         const index = findNearestFloorIndex(currentFloor, currentFloors, busyElevators)
         busyElevators[index] = true;
