@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { Elevator } from "./Elevator";
 import BuildingFloor from "../modules/BuildingFloor";
 import findNearestFloorIndex from "../helpers/findNearestFloorIndex";
-import { memo, useMemo } from 'react';
 import React from "react";
 const FLOOR_HEIGHT = 60;
 
@@ -30,23 +29,25 @@ const StyledBuilding = styled.div<IStyledBuild>`
 
 
 
-const Building = memo(({ currentFloors, currentFloor, floors, elevators, busyElevators }: IBuilding) => {
-    const nearestFloorIndex = useMemo(() => {
-        const index = findNearestFloorIndex(currentFloor, currentFloors, busyElevators)
+const Building = ({ currentFloors, currentFloor, floors, elevators, busyElevators }: IBuilding) => {
+
+    const nearestFreeElevator = () => {
+        const index = findNearestFloorIndex(currentFloor, currentFloors, busyElevators);
+        console.log("building ", busyElevators)
         busyElevators[index] = true;
         return index;
-    }, [currentFloor, currentFloors, busyElevators]);
-    setTimeout(() => busyElevators[nearestFloorIndex] = false, 1000);
+    };
+
     const buildingFloors = [];
     const buildingElevators = [];
-    currentFloors[nearestFloorIndex] = currentFloor;
+    currentFloors[nearestFreeElevator()] = currentFloor;
 
     for (let i = 0; i < floors + 1; i++) {
         buildingFloors.push(<BuildingFloor key={i} height={FLOOR_HEIGHT} />);
     }
 
     for (let i = 0; i < elevators; i += 1) {
-        const position = currentFloors[i] * FLOOR_HEIGHT
+        const position = currentFloors[i] * FLOOR_HEIGHT;
         buildingElevators.push(<Elevator key={i} number={i} position={position} />);
     }
 
@@ -56,6 +57,6 @@ const Building = memo(({ currentFloors, currentFloor, floors, elevators, busyEle
             {buildingElevators}
         </StyledBuilding>
     );
-});
+};
 
 export default Building;

@@ -1,15 +1,11 @@
 import React from "react";
-import { useForm, UseFormReturn, FieldValues } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 interface FormData {
   lifts: string;
   floors: string;
-}
 
-interface InputFormProps {
-  onSubmit: any;
-  register: UseFormReturn<FieldValues>["register"];
 }
 
 const StyledInputForm = styled.div`
@@ -46,29 +42,9 @@ width: calc(100% - 22px);
 position: static;
 `
 
-const StyledButton = styled.button`
-    &:active{
-        transform: translate(3px, 3px);
-    }
-    margin-top: 10px;
-    padding: 5px 10px; 
-    background: #818CF8;
-    border: 1px solid black;
-    cursor: pointer;
-    border-radius: 5px;
-`
+const InputForm = () => {
+  const { register } = useFormContext<FormData>();
 
-const InputForm: React.FC<InputFormProps> = ({ onSubmit, register }) => {
-  const { handleSubmit } = useForm<FormData>();
-
-  const handleFormSubmit = (data: FormData) => {
-    const newData = {
-      ...data,
-      lifts: data.lifts,
-      floors: data.floors,
-    };
-    onSubmit(newData);
-  };
 
   return (
     <StyledInputForm>
@@ -92,7 +68,6 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, register }) => {
           {...register("floors")}
         />
       </StyledDiv>
-      <StyledButton onClick={handleSubmit(handleFormSubmit)}>Submit</StyledButton>
     </StyledInputForm>
   );
 };

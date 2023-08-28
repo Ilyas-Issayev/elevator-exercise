@@ -10,13 +10,12 @@ const StyledElevatorButtons = styled.div`
   background-color: #e4e4e4;
   padding: 10px;
   border-radius: 10px;
-  max-height: 600px;
   overflow-y: auto
 `;
 
 interface ElevatorButtonsProps {
     floors: number;
-    pressed: boolean[];
+    pressed: [number, boolean][];
     onFloorRequest: (floor: number) => void;
 }
 
@@ -36,12 +35,13 @@ const ElevatorButtons: React.FC<ElevatorButtonsProps> = ({
     );
 
     const buttons = [];
-    // console.log(floors)
     for (let i = 0; i <= floors; i += 1) {
+        const pressedButtons = pressed.find((row) => row[0] === i);
+        const isPressed = pressedButtons !== undefined ? pressedButtons[1] : undefined;
         buttons.push(
             <ElevatorButton
                 key={i}
-                pressed={pressed[i]}
+                pressed={isPressed}
                 onClick={onButtonPress(i)}
             >
                 {i}
