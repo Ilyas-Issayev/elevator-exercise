@@ -1,18 +1,36 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import ElevatorButtons from "./components/Buttons";
-import Building from "./components/Building";
-import { Layout } from "./modules/Layout";
-import { FormProvider, useForm } from "react-hook-form";
-import InputForm from "./components/InputForm";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { useCallback, useEffect, useState } from "react";
+import ElevatorButtons from "./components/shared/Buttons";
+import Building from "./components/shared/Building";
+import { Layout } from "./components/UI/Layout";
+import { useForm, FormProvider } from "react-hook-form";
+import InputForm from "./components/shared/InputForm";
+import { Earth } from "./components/UI/Earth";
+import findNearestFloorIndex from "./helpers/findNearestFloorIndex";
+
+interface FormData {
+  lifts: number;
+  floors: number;
+}
+
+interface IElevatorInfo {
+  aim: number[],
+  start: number,
+}
 
 const App: React.FC = () => {
-
-  const methods = useForm();
+  const methods = useForm<FormData>();
+  const { setValue, getValues } = methods;
 
   const [currentFloor, setCurrentFloor] = useState<number>(0);
   const [elevatorRequests, setElevatorRequests] = useState<[number, boolean][]>([]);
-  const intervalRef = useRef<NodeJS.Timeout | undefined>();
 
+  const [floors, setFloors] = useState(8);
+  const [elevators, setElevators] = useState(1);
+  const [elevatorsInfo, setElevatorsInfo] = useState<IElevatorInfo[]>([{
+    aim: [],
+    start: 0,
+  }]);
 
   const onFloorRequest = useCallback(
     (floor: number) => {
@@ -28,45 +46,70 @@ const App: React.FC = () => {
   const moveToFloor = useCallback(
     (floor: number) => {
       setCurrentFloor(floor);
-      const newRequests = [...elevatorRequests].filter((row) => row[0] !== floor)
-      setTimeout(() => { setElevatorRequests(newRequests) }, 1000);
-    },
-    [elevatorRequests]
+      const newRequests = [...elevatorRequests].filter((row) => row[0] !== floor);
+      setElevatorRequests(newRequests);
+    }, [elevatorRequests]
   );
 
   useEffect(() => {
-    clearTimeout(intervalRef.current);
-    intervalRef.current = setInterval(() => {
+    const interval = setInterval(() => {
       elevatorRequests.map((request,) => {
         if (request[1] == true) {
           moveToFloor(request[0]);
+          return;
         }
       })
     }, 500);
-  }, [onFloorRequest]);
+    return () => clearInterval(interval);
+  }, [elevatorRequests, moveToFloor, floors]);
 
-  const [lifts, floors] = methods.watch(["lifts", "floors"]);
-  const busyElevators = Array.from({ length: Number(lifts) }, () => false);
-  const currentFloors = Array.from({ length: Number(lifts) || 1 }, () => 0);
+  const handleFormSubmit = (data: FormData) => {
+    const lifts = Math.min(data.lifts, 10);
+    setFloors(data.floors || 8);
+    setElevators(lifts)
+    setCurrentFloor(0);
+    const currentFloors = Array.from({ length: lifts }, () => ({
+      aim: [],
+      start: 0,
+    }));
+    setElevatorsInfo(currentFloors);
+  };
+
+
+  useEffect(() => {
+    const updatedCurrentFloors = [...elevatorsInfo];
+    const index = findNearestFloorIndex(currentFloor, elevatorsInfo);
+
+    if (updatedCurrentFloors[index].aim?.includes(currentFloor)) {
+      updatedCurrentFloors[index].aim = updatedCurrentFloors[index].aim.filter(floor => floor !== currentFloor);
+    } else if (updatedCurrentFloors[index].start !== currentFloor) {
+      updatedCurrentFloors[index].aim.push(currentFloor);
+    }
+    setElevatorsInfo(updatedCurrentFloors);
+  }, [currentFloor, getValues, setValue])
+
+  const handleChangeInfo = (info: IElevatorInfo[]) => setElevatorsInfo(info);
 
   return (
-    <Layout className="App">
-      <FormProvider {...methods}>
-        <InputForm />
-      </FormProvider>
-      <ElevatorButtons
-        floors={Number(methods.getValues("floors") || 8)}
-        onFloorRequest={onFloorRequest}
-        pressed={elevatorRequests}
-      />
-      <Building
-        floors={Number(floors) || 8}
-        elevators={lifts || 1}
-        currentFloors={currentFloors || []}
-        currentFloor={currentFloor}
-        busyElevators={busyElevators || []}
-      />
-    </Layout>
+    <>
+      <Layout className="App">
+        <FormProvider {...methods}>
+          <InputForm onSubmit={handleFormSubmit} />
+        </FormProvider>
+        <ElevatorButtons
+          floors={floors}
+          onFloorRequest={onFloorRequest}
+          pressed={elevatorRequests}
+        />
+        <Building
+          floors={floors}
+          elevators={elevators}
+          setElevatorInfo={handleChangeInfo}
+          currentFloors={elevatorsInfo}
+        />
+      </Layout>
+      <Earth />
+    </>
   );
 };
 

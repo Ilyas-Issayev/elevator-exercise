@@ -1,29 +1,40 @@
 const findNearestFloorIndex = (
-  value: number,
-  array: number[],
-  busyElevators: boolean[]
+  floor: number,
+  array: { aim: number[]; start: number }[]
 ) => {
-  let nearestIndex = -1;
-  let nearestDifference = Infinity;
-
-  console.log("test", busyElevators)
-
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] === value) return i;
-  }
+  let nearestEmptyAimIndex = -1;
+  let nearestNonEmptyAimIndex = -1;
+  let nearestEmptyAimDifference = Infinity;
+  let nearestNonEmptyAimDifference = Infinity;
 
   for (let i = 0; i < array.length; i++) {
-    if (!busyElevators[i]) {
+    if (array[i].start === floor) {
+      return i;
+    }
 
-      const difference = Math.abs(array[i] - value);
-      if (difference < nearestDifference || (difference === nearestDifference && i < nearestIndex)) {
-        nearestIndex = i;
-        nearestDifference = difference;
+    if (array[i].aim.length === 0) {
+      const difference = Math.abs(array[i].start - floor);
+
+      if (difference < nearestEmptyAimDifference) {
+        nearestEmptyAimIndex = i;
+        nearestEmptyAimDifference = difference;
+      }
+    } else {
+      const lastAim = array[i].aim[array[i].aim.length - 1];
+      const difference = Math.abs(lastAim - floor);
+
+      if (difference < nearestNonEmptyAimDifference) {
+        nearestNonEmptyAimIndex = i;
+        nearestNonEmptyAimDifference = difference;
       }
     }
   }
 
-  return nearestIndex;
+  if (nearestEmptyAimIndex !== -1) {
+    return nearestEmptyAimIndex;
+  }
+
+  return nearestNonEmptyAimIndex;
 };
 
 export default findNearestFloorIndex;

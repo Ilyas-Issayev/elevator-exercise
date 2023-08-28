@@ -1,0 +1,96 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
+interface FormData {
+    lifts: number;
+    floors: number;
+}
+
+interface InputFormProps {
+    onSubmit: any;
+}
+
+const FormContainer = styled.div`
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 1.5rem;
+    background-color: #e4e4e4;
+`;
+
+const FormGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Label = styled.label`
+    font-weight: normal;
+`;
+
+const Input = styled.input`
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+`;
+
+const SubmitButton = styled.button`
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+`;
+
+const ErrorAlert = styled.p`
+    color:red;
+`
+
+const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
+    const { handleSubmit, register, formState: { errors } } = useFormContext<FormData>();
+
+    const handleFormSubmit = (data: FormData) => onSubmit(data);
+
+    return (
+        <FormContainer>
+            <FormGroup>
+                <Label htmlFor="lifts">Lifts:</Label>
+                <Input
+                    id="lifts"
+                    type="number"
+                    placeholder="1"
+                    required
+                    {...register("lifts", {
+                        valueAsNumber: true,
+                        min: 1,
+                        max: {
+                            value: 10,
+                            message: "Lifts cannot be greater than 10"
+                        },
+                        required: true
+                    })}
+                />
+                {errors.lifts && <ErrorAlert>{errors.lifts.message}</ErrorAlert>}
+            </FormGroup>
+            <FormGroup>
+                <Label htmlFor="floors">Floors:</Label>
+                <Input
+                    id="floors"
+                    type="number"
+                    placeholder="8"
+                    required
+                    {...register("floors", { valueAsNumber: true })}
+                />
+                {errors.floors && <p>{errors.floors.message}</p>}
+            </FormGroup>
+            <SubmitButton onClick={handleSubmit(handleFormSubmit)}>Submit</SubmitButton>
+        </FormContainer>
+    );
+};
+
+export default InputForm;

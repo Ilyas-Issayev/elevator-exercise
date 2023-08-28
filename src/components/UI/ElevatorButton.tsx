@@ -1,30 +1,29 @@
-import React from "react";
 import styled from "styled-components";
 
 interface ElevatorButtonProps {
-  key: number;
   pressed?: boolean;
-  onClick: () => void,
   children?: React.ReactNode;
+  onClick?: () => void;
 }
 
 const StyledElevatorButton = styled.button<ElevatorButtonProps>`
   &[aria-pressed="true"] {
-    border: 5px solid yellow;
+    border: 5px solid #0000FF;
   }
   border-radius: 50%;
-  border: 5px solid black;
-  height: 100px;
-  width: 100px;
-  font-weight: bold;
-  font-size: 40px;
+  border: 1px solid black;
+  min-height: 40px;
+  min-width: 40px;
+  aspect-ratio: 1 / 1; 
+  font-weight: 600;
+  font-size: 25px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 `;
 
-const ElevatorButton: React.FC<ElevatorButtonProps> = ({ pressed, ...rest }) => {
-  return <StyledElevatorButton aria-pressed={!!pressed} {...rest} />;
-};
+const ElevatorButton: React.FC<ElevatorButtonProps> = ({ pressed, ...rest }) => (
+  <StyledElevatorButton aria-pressed={!!pressed} {...rest} />
+);
 
 export default ElevatorButton;
